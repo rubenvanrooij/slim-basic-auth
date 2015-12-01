@@ -31,6 +31,7 @@ class HttpBasicAuthentication extends \Slim\Middleware
         "realm" => "Protected",
         "environment" => "HTTP_AUTHORIZATION",
         "authenticator" => null,
+        "useWWWAuthenticateHeader" => true,
         "callback" => null,
         "error" => null
     );
@@ -112,7 +113,10 @@ class HttpBasicAuthentication extends \Slim\Middleware
         /* Check if user authenticates. */
         if (false === $this->options["authenticator"]($params)) {
             $this->app->response->status(401);
-            $this->app->response->header("WWW-Authenticate", sprintf('Basic realm="%s"', $this->options["realm"]));
+            
+            if($this->options["useWWWAuthenticateHeader"])
+                $this->app->response->header("WWW-Authenticate", sprintf('Basic realm="%s"', $this->options["realm"]));
+            
             $this->error(array(
                 "message" => "Authentication failed"
             ));
@@ -123,7 +127,10 @@ class HttpBasicAuthentication extends \Slim\Middleware
         if (is_callable($this->options["callback"])) {
             if (false === $this->options["callback"]($params)) {
                 $this->app->response->status(401);
-                $this->app->response->header("WWW-Authenticate", sprintf('Basic realm="%s"', $this->options["realm"]));
+
+                if($this->options["useWWWAuthenticateHeader"])
+                    $this->app->response->header("WWW-Authenticate", sprintf('Basic realm="%s"', $this->options["realm"]));
+                
                 $this->error(array(
                     "message" => "Callback returned false"
                 ));
@@ -180,6 +187,12 @@ class HttpBasicAuthentication extends \Slim\Middleware
         return $this;
     }
 
+    public function setUseWWWAuthenticateHeader($val)
+    {
+        $this->options["useWWWAuthenticateHeader"] = $authenticator;
+        return $this;
+    }
+
     public function getUsers()
     {
         return $this->options["users"];
@@ -218,6 +231,11 @@ class HttpBasicAuthentication extends \Slim\Middleware
     public function getEnvironment()
     {
         return $this->options["environment"];
+    }
+
+    public function getUseWWWAuthenticateHeader()
+    {
+        return $this->options["useWWWAuthenticateHeader"];
     }
 
     public function setEnvironment($environment)
