@@ -189,7 +189,7 @@ class HttpBasicAuthentication extends \Slim\Middleware
 
     public function setUseWWWAuthenticateHeader($val)
     {
-        $this->options["useWWWAuthenticateHeader"] = $authenticator;
+        $this->options["useWWWAuthenticateHeader"] = $val;
         return $this;
     }
 
